@@ -1,12 +1,14 @@
 <script setup>
-import { API_BASE_URL } from "../services/api";
+import { useRouter } from "vue-router";
 
 defineProps({
   quotes: { type: Array, required: true },
 });
 
-function pdfUrl(id) {
-  return `${API_BASE_URL}/quotes/${id}/pdf`;
+const router = useRouter();
+
+function openDetail(id) {
+  router.push({ name: "quote-detail", params: { id } });
 }
 </script>
 
@@ -27,7 +29,12 @@ function pdfUrl(id) {
         </tr>
       </thead>
       <tbody>
-        <tr v-for="quote in quotes" :key="quote.id">
+        <tr
+          v-for="quote in quotes"
+          :key="quote.id"
+          class="row-clickable"
+          @dblclick="openDetail(quote.id)"
+        >
           <td>{{ quote.insured.full_name }}</td>
           <td>{{ quote.insured.identification_number }}</td>
           <td>{{ quote.destination.country_name }}</td>
@@ -44,18 +51,17 @@ function pdfUrl(id) {
           </td>
           <td>{{ quote.created_at }}</td>
           <td>
-            <a
-              :href="pdfUrl(quote.id)"
-              target="_blank"
-              rel="noopener"
+            <RouterLink
+              :to="`/cotizaciones/${quote.id}`"
               class="link"
-              >PDF</a
+              @click.stop
+              >Ver</RouterLink
             >
           </td>
         </tr>
         <tr v-if="quotes.length === 0">
           <td colspan="9" class="empty">
-            Todavía no hay cotizaciones registradas.
+            No se encontraron cotizaciones con esos filtros.
           </td>
         </tr>
       </tbody>
@@ -64,6 +70,12 @@ function pdfUrl(id) {
 </template>
 
 <style scoped>
+.row-clickable {
+  cursor: pointer;
+}
+.row-clickable:hover {
+  background: var(--color-bg);
+}
 .link {
   color: var(--color-primary);
   font-weight: 600;

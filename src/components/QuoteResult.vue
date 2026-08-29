@@ -6,16 +6,30 @@ import { useQuotes } from "../composables/useQuotes";
 const props = defineProps({
   quote: { type: Object, required: true },
 });
-const emit = defineEmits(["hired", "reset"]);
+const emit = defineEmits(["hired", "reset", "deleted"]);
 
-const { loading, error, hireQuote } = useQuotes();
+const { loading, error, hireQuote, deleteQuote } = useQuotes();
 const localQuote = ref(props.quote);
+const deleting = ref(false);
 
 async function handleHire() {
   const updated = await hireQuote(localQuote.value.id);
   if (updated) {
     localQuote.value = updated;
     emit("hired", updated);
+  }
+}
+
+async function handleDelete() {
+  if (!confirm("¿Eliminar esta cotización? Esta acción no se puede deshacer."))
+    return;
+
+  deleting.value = true;
+  const ok = await deleteQuote(localQuote.value.id);
+  deleting.value = false;
+
+  if (ok) {
+    emit("deleted");
   }
 }
 
@@ -116,8 +130,16 @@ const pdfUrl = () => `${API_BASE_URL}/quotes/${localQuote.value.id}/pdf`;
       >
         Descargar PDF
       </a>
+      <button
+        v-if="localQuote.status === 'quoted'"
+        class="btn btn-danger"
+        :disabled="deleting"
+        @click="handleDelete"
+      >
+        {{ deleting ? "Eliminando..." : "Eliminar cotización" }}
+      </button>
       <button class="btn btn-secondary" @click="emit('reset')">
-        Nueva cotización
+        {{ localQuote.status === "quoted" ? "Nueva cotización" : "Volver" }}
       </button>
     </div>
   </div>

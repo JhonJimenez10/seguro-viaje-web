@@ -15,6 +15,7 @@ const {
   loading: submitting,
   error: submitError,
   validationErrors,
+  conflictQuote,
   createQuote,
 } = useQuotes();
 
@@ -77,8 +78,16 @@ onMounted(fetchCountries);
       instante.
     </p>
 
-    <div v-if="submitError" class="alert alert-error">{{ submitError }}</div>
-
+    <div v-if="submitError" class="alert alert-error">
+      {{ submitError }}
+      <RouterLink
+        v-if="conflictQuote"
+        :to="`/cotizaciones/${conflictQuote.id}`"
+        class="conflict-link"
+      >
+        Ver cotización activa #{{ conflictQuote.id }} &rarr;
+      </RouterLink>
+    </div>
     <h3 class="section-title">Datos del asegurado</h3>
     <div class="form-grid">
       <div class="field">
@@ -219,6 +228,13 @@ onMounted(fetchCountries);
   color: var(--color-text-muted);
   font-size: 14px;
   margin-bottom: 24px;
+}
+.conflict-link {
+  display: block;
+  margin-top: 6px;
+  font-weight: 700;
+  color: inherit;
+  text-decoration: underline;
 }
 .section-title {
   font-size: 14px;

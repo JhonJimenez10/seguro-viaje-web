@@ -225,3 +225,11 @@ th {
   border: 1px solid var(--color-border);
   background: var(--color-surface);
 }
+.btn-danger {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+}
+.btn-danger:not(:disabled):hover {
+  background: var(--color-danger);
+  color: #fff;
+}
